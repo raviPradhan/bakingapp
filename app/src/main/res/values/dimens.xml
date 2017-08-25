@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="dimen10">10dp</dimen>
+    <dimen name="progress_dimen">42dp</dimen>
+    <dimen name="recipe_item_height">200dp</dimen>
+
+    <dimen name="text16">16sp</dimen>
+    <dimen name="text14">14sp</dimen>
+    <dimen name="text12">12sp</dimen>
+    <dimen name="text17">17sp</dimen>
+    <dimen name="text20">20sp</dimen>
+
+</resources>

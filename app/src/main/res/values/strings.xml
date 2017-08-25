@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">BakingApp</string>
+    <string name="no_internet">Could not connect to the internet. Please check your internet settings.</string>
+    <string name="no_recipes">No recipes to show at the moment.</string>
+</resources>
