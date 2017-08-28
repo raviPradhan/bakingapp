@@ -3,8 +3,15 @@ package com.ravi.bakingapp.tasks;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
+import com.ravi.bakingapp.model.Ingredients;
 import com.ravi.bakingapp.model.Recipe;
+import com.ravi.bakingapp.model.Steps;
+import com.ravi.bakingapp.utils.JsonKeys;
 import com.ravi.bakingapp.utils.NetworkUtils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,18 +39,58 @@ public class GetRecipesLoader extends AsyncTaskLoader<ArrayList<Recipe>> {
 
     @Override
     public ArrayList<Recipe> loadInBackground() {
-        try{
+        ArrayList<Recipe> recipeData = new ArrayList<>();
+        try {
+            recipeList = new ArrayList<>();
             String response = NetworkUtils.getJson(url);
 
-        }catch (IOException ioEx){
+            JSONArray resultArray = new JSONArray(response);
+            for (int i = 0; i < resultArray.length(); i++) {
+                JSONObject recipeObject = resultArray.getJSONObject(i);
+                Recipe recipeItem = new Recipe();
+                recipeItem.setId(recipeObject.getInt(JsonKeys.ID_KEY));
+                recipeItem.setName(recipeObject.getString(JsonKeys.NAME_KEY));
+                recipeItem.setImgPath(recipeObject.getString(JsonKeys.IMAGE_KEY));
+                recipeItem.setServes(recipeObject.getInt(JsonKeys.SERVINGS_KEY));
+
+                JSONArray ingredientsArray = recipeObject.getJSONArray(JsonKeys.INGREDIENTS_KEY);
+                ArrayList<Ingredients> ingredientsList = new ArrayList<>();
+                for (int j = 0; j < ingredientsArray.length(); j++) {
+                    JSONObject ingredientsObject = ingredientsArray.getJSONObject(j);
+                    Ingredients ingredientsItem = new Ingredients();
+                    ingredientsItem.setIngredientName(ingredientsObject.getString(JsonKeys.INGREDIENT_KEY));
+                    ingredientsItem.setMeasure(ingredientsObject.getString(JsonKeys.MEASURE_KEY));
+                    ingredientsItem.setQuantity((float) ingredientsObject.getDouble(JsonKeys.QUANTITY_KEY));
+                    ingredientsList.add(ingredientsItem);
+                }
+
+                JSONArray stepsArray = recipeObject.getJSONArray(JsonKeys.STEPS_KEY);
+                ArrayList<Steps> stepsList = new ArrayList<>();
+                for (int k = 0; k < stepsArray.length(); k++) {
+                    JSONObject stepsObject = stepsArray.getJSONObject(k);
+                    Steps stepsItem = new Steps();
+                    stepsItem.setId(stepsObject.getInt(JsonKeys.ID_KEY));
+                    stepsItem.setShortDescription(stepsObject.getString(JsonKeys.SHORT_DESCRIPTION_KEY));
+                    stepsItem.setDescription(stepsObject.getString(JsonKeys.DESCRIPTION_KEY));
+                    stepsItem.setThumbnailUrl(stepsObject.getString(JsonKeys.THUMBNAIL_URL_KEY));
+                    stepsItem.setVideoUrl(stepsObject.getString(JsonKeys.VIDEO_URL_KEY));
+                    stepsList.add(stepsItem);
+                }
+                recipeItem.setIngredientsList(ingredientsList);
+                recipeItem.setStepsList(stepsList);
+                recipeData.add(recipeItem);
+            }
+        } catch (IOException ioEx) {
             ioEx.printStackTrace();
+        } catch (JSONException jex) {
+            jex.printStackTrace();
         }
-        return null;
+        return recipeData;
     }
 
     // deliverResult sends the result of the load, a Cursor, to the registered listener
     public void deliverResult(ArrayList<Recipe> data) {
-        recipeList.addAll(data);
+        recipeList = data;
         super.deliverResult(data);
     }
 }

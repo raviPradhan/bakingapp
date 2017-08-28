@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.ravi.bakingapp.R;
 import com.ravi.bakingapp.model.Recipe;
+import com.ravi.bakingapp.utils.OnItemClickHandler;
 
 import java.util.ArrayList;
 
@@ -23,10 +24,12 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Re
 
     private Context mContext;
     private ArrayList<Recipe> recipeList;
+    private OnItemClickHandler clickCallback;
 
-    public RecipeListAdapter(Context mContext, ArrayList<Recipe> list) {
+    public RecipeListAdapter(Context mContext, ArrayList<Recipe> list, OnItemClickHandler callback) {
         this.mContext = mContext;
         this.recipeList = list;
+        this.clickCallback = callback;
     }
 
     // Inner class for creating ViewHolders
@@ -70,16 +73,22 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Re
     @Override
     public void onBindViewHolder(RecipeViewHolder holder, int position) {
         Recipe currentItem = recipeList.get(position);
-
+        final int adapterPosition = position;
         holder.recipeName.setText(currentItem.getName());
         Glide.with(mContext).load(currentItem.getImgPath())
                 .placeholder(holder.placeHolder)
                 .error(holder.placeHolder).
                 into(holder.recipeImage);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickCallback.onClick(adapterPosition);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return recipeList.size();
+        return (recipeList == null)? 0 : recipeList.size();
     }
 }
