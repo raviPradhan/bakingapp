@@ -1,9 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.ravi.bakingapp.RecipeDetailActivity">
+    android:orientation="vertical">
 
-</android.support.constraint.ConstraintLayout>
+    <include layout="@layout/toolbar" />
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/recipe_holder_height"
+                android:background="@color/colorWhiteDivider"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/iv_recipe_detail_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/recipe_image_height" />
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:id="@+id/tv_recipe_detail_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="@color/colorTextPrimary"
+                    android:textSize="@dimen/text20"
+                    tools:text="French Chocolate Brioches" />
+            </LinearLayout>
+
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dimen10"
+                android:layout_marginStart="@dimen/dimen10"
+                android:layout_marginTop="@dimen/dimen10"
+                android:text="@string/ingredients"
+                android:textColor="@color/colorTextPrimary"
+                android:textSize="@dimen/text14" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_recipe_detail_ingredients"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dimen10"
+                android:layout_marginRight="@dimen/dimen10"
+                android:layout_marginTop="@dimen/dimen8" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:background="@android:color/white" />
+
+            <android.support.v7.widget.AppCompatTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dimen10"
+                android:layout_marginStart="@dimen/dimen10"
+                android:layout_marginTop="@dimen/dimen10"
+                android:text="@string/steps"
+                android:textColor="@color/colorTextPrimary"
+                android:textSize="@dimen/text14" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_recipe_detail_steps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dimen10"
+                android:layout_marginRight="@dimen/dimen10"
+                android:layout_marginTop="@dimen/dimen8" />
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</LinearLayout>

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/recipe_item_height"
+    android:layout_height="@dimen/recipe_image_height"
     android:orientation="vertical"
     android:padding="10dp"
     app:cardElevation="3dp"
@@ -12,7 +12,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorLightPrimary">
+        android:background="@color/cardview_light_background">
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/iv_recipe_item_image"

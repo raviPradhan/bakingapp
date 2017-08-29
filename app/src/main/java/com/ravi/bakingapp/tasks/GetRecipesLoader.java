@@ -60,7 +60,7 @@ public class GetRecipesLoader extends AsyncTaskLoader<ArrayList<Recipe>> {
                     Ingredients ingredientsItem = new Ingredients();
                     ingredientsItem.setIngredientName(ingredientsObject.getString(JsonKeys.INGREDIENT_KEY));
                     ingredientsItem.setMeasure(ingredientsObject.getString(JsonKeys.MEASURE_KEY));
-                    ingredientsItem.setQuantity((float) ingredientsObject.getDouble(JsonKeys.QUANTITY_KEY));
+                    ingredientsItem.setQuantity(ingredientsObject.getString(JsonKeys.QUANTITY_KEY));
                     ingredientsList.add(ingredientsItem);
                 }
 

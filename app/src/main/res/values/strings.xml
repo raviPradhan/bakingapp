@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">BakingApp</string>
-    <string name="no_internet">Could not connect to the internet. Please check your internet settings.</string>
-    <string name="no_recipes">No recipes to show at the moment.</string>
+    <string name="no_internet" translatable="true">Could not connect to the internet. Please check your internet settings.</string>
+    <string name="no_recipes" translatable="true">No recipes to show at the moment.</string>
+    <string name="no_video" translatable="true">No video to show for this step.</string>
+
+    <string name="ingredients" translatable="true">Ingredients</string>
+    <string name="steps" translatable="true">Steps</string>
+    <string name="bullet">\u25CF</string>
+    <string name="dynamic_quantity">%1$s %2$s</string>
 </resources>

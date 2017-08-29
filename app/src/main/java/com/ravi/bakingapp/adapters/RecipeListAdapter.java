@@ -48,7 +48,7 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Re
          *
          * @param itemView The view inflated in onCreateViewHolder
          */
-        public RecipeViewHolder(View itemView) {
+        RecipeViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

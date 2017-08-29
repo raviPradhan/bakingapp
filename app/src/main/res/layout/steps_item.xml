@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/dimen8"
+    android:paddingTop="@dimen/dimen8">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/iv_steps_item_thumbnail"
+        android:layout_width="@dimen/thumbnail_dimen"
+        android:layout_height="@dimen/thumbnail_dimen"
+        app:srcCompat="@drawable/ic_play" />
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/tv_steps_item_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="@dimen/dimen10"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/text14"
+        tools:text="Descriptions 1" />
+
+</LinearLayout>

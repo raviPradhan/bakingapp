@@ -17,5 +17,7 @@ public class JsonKeys {
     public static final String VIDEO_URL_KEY = "videoURL";
     public static final String THUMBNAIL_URL_KEY = "thumbnailURL";
 
+    public static final String DATA_KEY = "data";
+
 
 }

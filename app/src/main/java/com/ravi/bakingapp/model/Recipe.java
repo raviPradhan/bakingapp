@@ -1,8 +1,11 @@
 package com.ravi.bakingapp.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
-public class Recipe {
+public class Recipe implements Parcelable {
     private int id, serves;
     private String name, imgPath;
     private ArrayList<Ingredients> ingredientsList;
@@ -55,4 +58,45 @@ public class Recipe {
     public void setStepsList(ArrayList<Steps> stepsList) {
         this.stepsList = stepsList;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.id);
+        dest.writeInt(this.serves);
+        dest.writeString(this.name);
+        dest.writeString(this.imgPath);
+        dest.writeList(this.ingredientsList);
+        dest.writeList(this.stepsList);
+    }
+
+    public Recipe() {
+    }
+
+    protected Recipe(Parcel in) {
+        this.id = in.readInt();
+        this.serves = in.readInt();
+        this.name = in.readString();
+        this.imgPath = in.readString();
+        this.ingredientsList = new ArrayList<Ingredients>();
+        in.readList(this.ingredientsList, Ingredients.class.getClassLoader());
+        this.stepsList = new ArrayList<Steps>();
+        in.readList(this.stepsList, Steps.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<Recipe> CREATOR = new Parcelable.Creator<Recipe>() {
+        @Override
+        public Recipe createFromParcel(Parcel source) {
+            return new Recipe(source);
+        }
+
+        @Override
+        public Recipe[] newArray(int size) {
+            return new Recipe[size];
+        }
+    };
 }

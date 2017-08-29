@@ -2,8 +2,12 @@
 <resources>
 
     <dimen name="dimen10">10dp</dimen>
+    <dimen name="dimen8">8dp</dimen>
+    <dimen name="divider_height">4dp</dimen>
     <dimen name="progress_dimen">42dp</dimen>
-    <dimen name="recipe_item_height">200dp</dimen>
+    <dimen name="thumbnail_dimen">50dp</dimen>
+    <dimen name="recipe_image_height">200dp</dimen>
+    <dimen name="recipe_holder_height">230dp</dimen>
 
     <dimen name="text16">16sp</dimen>
     <dimen name="text14">14sp</dimen>

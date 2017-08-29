@@ -7,7 +7,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -17,6 +17,7 @@ import com.ravi.bakingapp.adapters.RecipeListAdapter;
 import com.ravi.bakingapp.model.Recipe;
 import com.ravi.bakingapp.tasks.GetRecipesLoader;
 import com.ravi.bakingapp.utils.Constants;
+import com.ravi.bakingapp.utils.JsonKeys;
 import com.ravi.bakingapp.utils.NetworkUtils;
 import com.ravi.bakingapp.utils.OnItemClickHandler;
 
@@ -30,10 +31,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @BindView(R.id.rv_main_recipeList)
     RecyclerView recipeRecycler;
-
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
     @BindView(R.id.tv_main_message)
     TextView messageText;
-
     @BindView(R.id.pb_main_progress)
     ProgressBar progress;
 
@@ -53,6 +54,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(R.string.app_name);
+
         recipeList = new ArrayList<>();
         setAdapter();
         if (NetworkUtils.isInternetConnected(this)) {
@@ -106,6 +111,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onClick(int position) {
-        startActivity(new Intent(this, RecipeDetailActivity.class));
+        startActivity(new Intent(this, RecipeDetailActivity.class).putExtra(JsonKeys.DATA_KEY, recipeList.get(position)));
     }
 }

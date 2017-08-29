@@ -1,33 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.ravi.bakingapp.MainActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_main_recipeList"
+    <include layout="@layout/toolbar" />
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
+        android:layout_height="match_parent">
 
-    <android.support.v7.widget.AppCompatTextView
-        android:id="@+id/tv_main_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginLeft="@dimen/dimen10"
-        android:layout_marginRight="@dimen/dimen10"
-        android:gravity="center"
-        android:textColor="@color/colorAccent"
-        android:textSize="@dimen/text14"
-        android:visibility="gone"
-        tools:text="@string/no_internet" />
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_main_recipeList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
 
-    <ProgressBar
-        android:id="@+id/pb_main_progress"
-        android:layout_width="@dimen/progress_dimen"
-        android:layout_height="@dimen/progress_dimen"
-        android:layout_gravity="center" />
-</FrameLayout>
+        <android.support.v7.widget.AppCompatTextView
+            android:id="@+id/tv_main_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/dimen10"
+            android:layout_marginRight="@dimen/dimen10"
+            android:gravity="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/text14"
+            android:visibility="gone"
+            tools:text="@string/no_internet" />
+
+        <ProgressBar
+            android:id="@+id/pb_main_progress"
+            android:layout_width="@dimen/progress_dimen"
+            android:layout_height="@dimen/progress_dimen"
+            android:layout_gravity="center" />
+    </FrameLayout>
+</LinearLayout>
