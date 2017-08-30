@@ -3,11 +3,12 @@ package com.ravi.bakingapp;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -36,46 +37,42 @@ import butterknife.ButterKnife;
 
 import static android.view.View.GONE;
 
-public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.EventListener {
+public class StepDetailFragment extends Fragment implements ExoPlayer.EventListener {
 
     @BindView(R.id.tv_step_detail_description)
     TextView stepDescription;
     @BindView(R.id.epv_step_detail_player)
     SimpleExoPlayerView mPlayerView;
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
     @BindView(R.id.rl_step_detail_noVideo)
     RelativeLayout noVideoLayout;
 
     private SimpleExoPlayer mExoPlayer;
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
-
-    private static final String TAG = StepDetailActivity.class.getSimpleName();
     Steps stepItem;
 
+    private static final String TAG = StepDetailFragment.class.getSimpleName();
+
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_step_detail, container, false);
+    }
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        setContentView(R.layout.activity_step_detail);
-
-        ButterKnife.bind(this);
-        stepItem = getIntent().getParcelableExtra(JsonKeys.DATA_KEY);
-
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(stepItem.getShortDescription());
-
-
+        ButterKnife.bind(this, view);
+        stepItem = getArguments().getParcelable(JsonKeys.DATA_KEY);
 
         stepDescription.setText(stepItem.getDescription());
         String urlToPlay = getUrl();
-        if(urlToPlay == null){
+        if (urlToPlay == null) {
             noVideoLayout.setVisibility(View.VISIBLE);
             mPlayerView.setVisibility(GONE);
-        }else{
+        } else {
             // Initialize the Media Session.
             initializeMediaSession();
             // Initialize the player.
@@ -83,10 +80,10 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
         }
     }
 
-    private String getUrl(){
-        if(!stepItem.getVideoUrl().isEmpty())
+    private String getUrl() {
+        if (!stepItem.getVideoUrl().isEmpty())
             return stepItem.getVideoUrl();
-        else if(!stepItem.getThumbnailUrl().isEmpty())
+        else if (!stepItem.getThumbnailUrl().isEmpty())
             return stepItem.getThumbnailUrl();
         else
             return null;
@@ -99,7 +96,7 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
     private void initializeMediaSession() {
 
         // Create a MediaSessionCompat.
-        mMediaSession = new MediaSessionCompat(this, TAG);
+        mMediaSession = new MediaSessionCompat(getContext(), TAG);
 
         // Enable callbacks from MediaButtons and TransportControls.
         mMediaSession.setFlags(
@@ -115,7 +112,7 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
                         /*PlaybackStateCompat.ACTION_PLAY |
                                 PlaybackStateCompat.ACTION_PAUSE |
                                 PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |*/
-                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
+                        PlaybackStateCompat.ACTION_PLAY_PAUSE);
 
         mMediaSession.setPlaybackState(mStateBuilder.build());
 
@@ -130,6 +127,7 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
 
     /**
      * Initialize ExoPlayer.
+     *
      * @param mediaUri The URI of the sample to play.
      */
     private void initializePlayer(Uri mediaUri) {
@@ -137,16 +135,16 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector, loadControl);
             mPlayerView.setPlayer(mExoPlayer);
 
             // Set the ExoPlayer.EventListener to this activity.
             mExoPlayer.addListener(this);
 
             // Prepare the MediaSource.
-            String userAgent = Util.getUserAgent(this, getString(R.string.app_name));
+            String userAgent = Util.getUserAgent(getContext(), getString(R.string.app_name));
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
-                    this, userAgent), new DefaultExtractorsFactory(), null, null);
+                    getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
             mExoPlayer.setPlayWhenReady(true);
         }
@@ -156,7 +154,7 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
      * Release ExoPlayer.
      */
     private void releasePlayer() {
-        if(mExoPlayer != null){
+        if (mExoPlayer != null) {
             mExoPlayer.stop();
             mExoPlayer.release();
             mExoPlayer = null;
@@ -167,10 +165,18 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
      * Release the player when the activity is destroyed.
      */
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
+
+
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
         releasePlayer();
-        if(mMediaSession != null)
+        if (mMediaSession != null)
             mMediaSession.setActive(false);
     }
 
@@ -191,10 +197,10 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        if((playbackState == ExoPlayer.STATE_READY) && playWhenReady){
+        if ((playbackState == ExoPlayer.STATE_READY) && playWhenReady) {
             mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
                     mExoPlayer.getCurrentPosition(), 1f);
-        } else if((playbackState == ExoPlayer.STATE_READY)){
+        } else if ((playbackState == ExoPlayer.STATE_READY)) {
             mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
                     mExoPlayer.getCurrentPosition(), 1f);
         }
@@ -223,11 +229,6 @@ public class StepDetailActivity extends AppCompatActivity implements ExoPlayer.E
         @Override
         public void onPause() {
             mExoPlayer.setPlayWhenReady(false);
-        }
-
-        @Override
-        public void onSkipToPrevious() {
-            mExoPlayer.seekTo(0);
         }
     }
 }

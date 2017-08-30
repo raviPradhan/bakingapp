@@ -1,17 +1,19 @@
 package com.ravi.bakingapp;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ravi.bakingapp.adapters.RecipeListAdapter;
 import com.ravi.bakingapp.model.Recipe;
@@ -29,10 +31,12 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<Recipe>>, OnItemClickHandler {
 
-    @BindView(R.id.rv_main_recipeList)
-    RecyclerView recipeRecycler;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    @BindView(R.id.rv_main_recipeList)
+    RecyclerView recipeRecycler;
+
     @BindView(R.id.tv_main_message)
     TextView messageText;
     @BindView(R.id.pb_main_progress)
@@ -58,22 +62,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(R.string.app_name);
 
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+
         recipeList = new ArrayList<>();
         setAdapter();
         if (NetworkUtils.isInternetConnected(this)) {
             getSupportLoaderManager().initLoader(RECIPES_LOADER_ID, null, this);
         } else {
-            Toast.makeText(this, noInternet, Toast.LENGTH_SHORT).show();
+            messageText.setText(noInternet);
+            messageText.setVisibility(View.VISIBLE);
         }
-
     }
 
     private void setAdapter() {
         messageText.setVisibility(View.GONE);
         recipeRecycler.setVisibility(View.VISIBLE);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            recipeRecycler.setLayoutManager(new LinearLayoutManager(this));
+        } else {
+            recipeRecycler.setLayoutManager(new GridLayoutManager(this, 3));
+        }
         if (adapter == null) {
             adapter = new RecipeListAdapter(this, recipeList, this);
-            recipeRecycler.setLayoutManager(new LinearLayoutManager(this));
             recipeRecycler.setAdapter(adapter);
         } else {
             adapter.notifyDataSetChanged();
@@ -111,6 +121,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onClick(int position) {
-        startActivity(new Intent(this, RecipeDetailActivity.class).putExtra(JsonKeys.DATA_KEY, recipeList.get(position)));
+        startActivity(new Intent(this, MasterActivity.class).putExtra(JsonKeys.DATA_KEY, recipeList.get(position)));
     }
 }

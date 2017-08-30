@@ -76,9 +76,8 @@ public class RecipeListAdapter extends RecyclerView.Adapter<RecipeListAdapter.Re
         final int adapterPosition = position;
         holder.recipeName.setText(currentItem.getName());
         Glide.with(mContext).load(currentItem.getImgPath())
-                .placeholder(holder.placeHolder)
-                .error(holder.placeHolder).
-                into(holder.recipeImage);
+                .fallback(holder.placeHolder)
+                .into(holder.recipeImage);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
