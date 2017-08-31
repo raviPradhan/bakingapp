@@ -57,7 +57,10 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_step_detail, container, false);
+        if(savedInstanceState == null)
+            return inflater.inflate(R.layout.fragment_step_detail, container, false);
+        else
+            return null;
     }
 
     @Override
@@ -65,9 +68,6 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         super.onViewCreated(view, savedInstanceState);
 
         ButterKnife.bind(this, view);
-        stepItem = getArguments().getParcelable(JsonKeys.DATA_KEY);
-
-        stepDescription.setText(stepItem.getDescription());
         String urlToPlay = getUrl();
         if (urlToPlay == null) {
             noVideoLayout.setVisibility(View.VISIBLE);
@@ -81,12 +81,19 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     }
 
     private String getUrl() {
-        if (!stepItem.getVideoUrl().isEmpty())
-            return stepItem.getVideoUrl();
-        else if (!stepItem.getThumbnailUrl().isEmpty())
-            return stepItem.getThumbnailUrl();
-        else
+        if(getArguments() != null){
+            stepItem = getArguments().getParcelable(JsonKeys.DATA_KEY);
+
+            stepDescription.setText(stepItem.getDescription());
+            if (!stepItem.getVideoUrl().isEmpty())
+                return stepItem.getVideoUrl();
+            else if (!stepItem.getThumbnailUrl().isEmpty())
+                return stepItem.getThumbnailUrl();
+            else
+                return null;
+        }else{
             return null;
+        }
     }
 
     /**
@@ -168,7 +175,9 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     public void onDestroyView() {
         super.onDestroyView();
 
-
+        releasePlayer();
+        if (mMediaSession != null)
+            mMediaSession.setActive(false);
     }
 
     @Override

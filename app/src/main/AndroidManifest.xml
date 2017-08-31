@@ -19,9 +19,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MasterActivity" />
+        <activity android:name=".MasterActivity"
+            android:launchMode="singleTop"/>
 
-        <activity android:name=".StepActivity" />
+        <activity android:name=".StepActivity"
+            android:launchMode="singleTop"/>
 
         <receiver android:name="android.support.v4.media.session.MediaButtonReceiver" >
             <intent-filter>

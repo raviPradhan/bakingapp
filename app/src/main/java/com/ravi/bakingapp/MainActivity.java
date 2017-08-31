@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoadFinished(Loader<ArrayList<Recipe>> loader, ArrayList<Recipe> data) {
         progress.setVisibility(View.GONE);
         recipeList.addAll(data);
-        if (recipeList == null) {
+        if (recipeList.isEmpty()) {
             recipeRecycler.setVisibility(View.GONE);
             messageText.setText(noRecipes);
             messageText.setVisibility(View.VISIBLE);
@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoaderReset(Loader<ArrayList<Recipe>> loader) {
         if (recipeList != null)
             recipeList.clear();
+
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.ravi.bakingapp.model.Recipe;
@@ -39,32 +40,39 @@ public class MasterActivity extends AppCompatActivity implements RecipeDetailFra
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             twoPane = false;
-        }else{
-            twoPane = true;
-            Bundle bundle = new Bundle();
-            bundle.putParcelable(JsonKeys.DATA_KEY, recipeItem.getStepsList().get(0));
-            Fragment fragment = new StepDetailFragment();
-            fragment.setArguments(bundle);
-            getSupportFragmentManager().beginTransaction().add(R.id.fl_master_container, fragment).commit();
+        } else {
+            if (findViewById(R.id.fl_master_container) != null) {
+                twoPane = true;
+                if (savedInstanceState == null) {
+                    Log.v("STATE", "NULL");
+                /*Bundle bundle = new Bundle();
+                bundle.putParcelable(JsonKeys.DATA_KEY, recipeItem.getStepsList().get(0));*/
+                    Fragment fragment = new StepDetailFragment();
+//                fragment.setArguments(bundle);
+                    getSupportFragmentManager().beginTransaction().add(R.id.fl_master_container, fragment).commit();
+                } else {
+                    Log.v("STATE", "NOT NULL");
+                }
+            }
         }
     }
 
     @Override
     public void onStepSelected(int position) {
-        if(twoPane){
+        if (twoPane) {
             Bundle bundle = new Bundle();
             bundle.putParcelable(JsonKeys.DATA_KEY, recipeItem.getStepsList().get(position));
             Fragment fragment = new StepDetailFragment();
             fragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.fl_master_container, fragment).commit();
-        }else{
+        } else {
             startActivity(new Intent(this, StepActivity.class).putExtra(JsonKeys.DATA_KEY, recipeItem.getStepsList().get(position)));
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home)
+        if (item.getItemId() == android.R.id.home)
             finish();
         return super.onOptionsItemSelected(item);
     }
