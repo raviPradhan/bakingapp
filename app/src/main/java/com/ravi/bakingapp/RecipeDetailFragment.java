@@ -1,5 +1,6 @@
 package com.ravi.bakingapp;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -13,9 +14,13 @@ import android.view.ViewGroup;
 
 import com.ravi.bakingapp.adapters.IngredientsAdapter;
 import com.ravi.bakingapp.adapters.StepsAdapter;
+import com.ravi.bakingapp.database.RecipesContract;
+import com.ravi.bakingapp.model.Ingredients;
 import com.ravi.bakingapp.model.Recipe;
 import com.ravi.bakingapp.utils.JsonKeys;
 import com.ravi.bakingapp.utils.OnItemClickHandler;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -27,6 +32,7 @@ public class RecipeDetailFragment extends Fragment implements OnItemClickHandler
     @BindView(R.id.rv_steps_recycler)
     RecyclerView stepsRecycler;
 
+    ArrayList<Ingredients> ingredientsList;
     IngredientsAdapter adapter;
     StepsAdapter stepsAdapter;
 
@@ -69,12 +75,32 @@ public class RecipeDetailFragment extends Fragment implements OnItemClickHandler
         ingredientsRecycler.setHasFixedSize(true);
 
         Recipe recipeItem = getActivity().getIntent().getParcelableExtra(JsonKeys.DATA_KEY);
-
-        adapter = new IngredientsAdapter(getContext(), recipeItem.getIngredientsList());
+        ingredientsList = recipeItem.getIngredientsList();
+        adapter = new IngredientsAdapter(getContext(), ingredientsList);
         ingredientsRecycler.setAdapter(adapter);
 
         stepsAdapter = new StepsAdapter(getContext(), recipeItem.getStepsList(), this);
         stepsRecycler.setAdapter(stepsAdapter);
+
+        createDatabase();
+    }
+
+    private void createDatabase(){
+        // clear database first
+        getActivity().getContentResolver().delete(RecipesContract.RecipeEntry.CONTENT_URI, null, null);
+        // create new value set
+        ContentValues[] contentValues = new ContentValues[ingredientsList.size()];
+        int i = 0;
+        for(Ingredients ingredients : ingredientsList){
+            ContentValues values = new ContentValues();
+            values.put(RecipesContract.RecipeEntry.COLUMN_INGREDIENT, ingredients.getIngredientName());
+            values.put(RecipesContract.RecipeEntry.COLUMN_MEASURE, ingredients.getMeasure());
+            values.put(RecipesContract.RecipeEntry.COLUMN_QUANTITY, ingredients.getQuantity());
+            contentValues[i++] = values;
+        }
+        // insert
+        getActivity().getContentResolver().bulkInsert(RecipesContract.RecipeEntry.CONTENT_URI, contentValues);
+        WidgetUpdateService.startActionUpdateRecipeWidget(getContext());
     }
 
     @Override

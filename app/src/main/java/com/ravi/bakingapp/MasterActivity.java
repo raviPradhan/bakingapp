@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.ravi.bakingapp.model.Recipe;
@@ -44,14 +43,8 @@ public class MasterActivity extends AppCompatActivity implements RecipeDetailFra
             if (findViewById(R.id.fl_master_container) != null) {
                 twoPane = true;
                 if (savedInstanceState == null) {
-                    Log.v("STATE", "NULL");
-                /*Bundle bundle = new Bundle();
-                bundle.putParcelable(JsonKeys.DATA_KEY, recipeItem.getStepsList().get(0));*/
                     Fragment fragment = new StepDetailFragment();
-//                fragment.setArguments(bundle);
                     getSupportFragmentManager().beginTransaction().add(R.id.fl_master_container, fragment).commit();
-                } else {
-                    Log.v("STATE", "NOT NULL");
                 }
             }
         }
