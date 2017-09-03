@@ -1,6 +1,8 @@
 package com.ravi.bakingapp.utils;
 
 public class JsonKeys {
+    public static final String CACHE_MAIN_KEY = "bakingapp_cache";
+
     public static final String ID_KEY = "id";
     public static final String NAME_KEY = "name";
     public static final String SERVINGS_KEY = "servings";

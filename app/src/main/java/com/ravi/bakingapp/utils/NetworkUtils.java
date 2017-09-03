@@ -31,7 +31,7 @@ public class NetworkUtils {
         }
         HttpURLConnection conn = null;
         try {
-            Log.e("URL", "> " + url);
+            Log.e(Constants.TAG, "URL > " + url);
             conn = (HttpURLConnection) url.openConnection();
             conn.setConnectTimeout(Constants.TIMEOUT_CONNECTION);
             conn.setReadTimeout(Constants.TIMEOUT_SOCKET);

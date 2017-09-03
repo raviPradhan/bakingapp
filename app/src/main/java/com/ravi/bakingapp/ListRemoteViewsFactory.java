@@ -2,13 +2,10 @@ package com.ravi.bakingapp;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.ravi.bakingapp.database.RecipesContract;
-import com.ravi.bakingapp.utils.Constants;
 
 import static com.ravi.bakingapp.database.RecipesContract.RecipeEntry.CONTENT_URI;
 
@@ -29,7 +26,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public void onDataSetChanged() {
-        Log.v(Constants.TAG, "onDataSetChanged()");
+//        Log.v(Constants.TAG, "onDataSetChanged()");
         //Query to get the the ingredients stored
 //        Uri INGREDIENT_URI = RecipesContract.BASE_CONTENT_URI.buildUpon().appendPath(RecipesContract.PATH_RECIPES).build();
         if (mCursor != null) mCursor.close();
@@ -39,7 +36,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 null,
                 null,
                 null);
-        Log.v(Constants.TAG, "" + mCursor.getCount());
+//        Log.v(Constants.TAG, "READ DATA SIZE " + mCursor.getCount());
     }
 
     @Override
@@ -65,12 +62,11 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         String ingredient = mCursor.getString(ingredientIndex);
         String measure = mCursor.getString(measureIndex);
         String quantity = mCursor.getString(quantityIndex);
+        RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.list_inredient_item);
 
-        RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.ingredient_item);
-
-        views.setTextViewText(R.id.tv_ingredient_item_name, ingredient);
-        views.setTextViewText(R.id.tv_ingredient_item_quantity, mContext.getString(R.string.dynamic_quantity, quantity, measure));
-
+        views.setTextViewText(R.id.tv_list_item_name, ingredient);
+        views.setTextViewText(R.id.tv_list_item_quantity, mContext.getString(R.string.dynamic_quantity, quantity, measure));
+//        Log.v(Constants.TAG, "Applying views " + ingredient);
         return views;
     }
 
@@ -81,7 +77,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public int getViewTypeCount() {
-        return 0; // Treat all items in the GridView the same
+        return 1; // Treat all items in the ListView the same
     }
 
     @Override

@@ -53,7 +53,7 @@
         <provider
             android:name=".database.RecipeProvider"
             android:authorities="com.ravi.bakingapp"
-            android:exported="false" />
+            android:exported="true" />
 
 
     </application>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingBottom="8dp"
+    android:paddingTop="8dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/bullet"
+        android:textColor="@color/colorGreyDivider" />
+
+    <TextView
+        android:id="@+id/tv_list_item_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/dimen10"
+        android:layout_marginStart="@dimen/dimen10"
+        android:layout_weight=".75"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/text14"
+        tools:text="Mascapone Chees (Room Temperature)" />
+
+    <TextView
+        android:id="@+id/tv_list_item_quantity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".25"
+        android:gravity="end"
+        android:paddingLeft="@dimen/dimen10"
+        android:paddingRight="@dimen/dimen10"
+        android:textColor="@color/colorTextSecondary"
+        android:textSize="@dimen/text14"
+        tools:text="1 Cup" />
+
+
+</LinearLayout>

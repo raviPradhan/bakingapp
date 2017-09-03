@@ -57,7 +57,7 @@ public class RecipeProvider extends ContentProvider {
         int match = sUriMatcher.match(uri);
         Cursor retCursor;
 
-        // Query for the favorites directory and write a default case
+        // Query for the ingredients directory and write a default case
         switch (match) {
             // Query for the tasks directory
             case RECIPE:
@@ -96,7 +96,7 @@ public class RecipeProvider extends ContentProvider {
         Uri returnUri; // URI to be returned
         switch (match) {
             case RECIPE:
-                // Inserting values into favorites table
+                // Inserting values into recipe table
                 long id = db.insertWithOnConflict(TABLE_NAME, null, contentValues, SQLiteDatabase.CONFLICT_IGNORE);
                 if (id > 0) {
                     returnUri = ContentUris.withAppendedId(CONTENT_URI, id);
@@ -116,28 +116,38 @@ public class RecipeProvider extends ContentProvider {
     @Override
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         SQLiteDatabase db = favoritesHelper.getWritableDatabase();
-        int rowCount = 0;
-        db.beginTransaction();
-        try {
-            for(ContentValues value : values){
-                long id = db.insert(TABLE_NAME, null, value);
-                if(id > 0)
-                    rowCount++;
-            }
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }finally {
-            db.endTransaction();
+        final int match = sUriMatcher.match(uri);
+        switch(match){
+            case RECIPE:
+                int rowCount = 0;
+                db.beginTransaction();
+                try {
+                    for(ContentValues value : values){
+                        long id = db.insert(TABLE_NAME, null, value);
+                        if(id > 0)
+                            rowCount++;
+                    }
+                    db.setTransactionSuccessful();
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                Log.v(Constants.TAG, "Rows inserted " + rowCount);
+                return  rowCount;
+
+            default:
+                return super.bulkInsert(uri, values);
         }
-        Log.v(Constants.TAG, "Rows inserted " + rowCount);
-        getContext().getContentResolver().notifyChange(uri, null);
-        return  rowCount;
     }
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
         final SQLiteDatabase db = favoritesHelper.getWritableDatabase();
-        return db.delete(TABLE_NAME, null, null);
+        int rowsDeleted = db.delete(TABLE_NAME, null, null);
+        Log.v(Constants.TAG, "deleting database " + rowsDeleted);
+        return rowsDeleted;
     }
 
     @Override

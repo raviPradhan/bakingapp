@@ -64,14 +64,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 
-        recipeList = new ArrayList<>();
-        setAdapter();
-        if (NetworkUtils.isInternetConnected(this)) {
-            getSupportLoaderManager().initLoader(RECIPES_LOADER_ID, null, this);
-        } else {
-            messageText.setText(noInternet);
-            messageText.setVisibility(View.VISIBLE);
+        if(savedInstanceState != null){ // load any saved data in the instance
+            recipeList = savedInstanceState.getParcelableArrayList(JsonKeys.DATA_KEY);
+            setAdapter();
+        }else{ // make a network call if there is no data present
+            recipeList = new ArrayList<>();
+            setAdapter();
+            if (NetworkUtils.isInternetConnected(this)) {
+                getSupportLoaderManager().initLoader(RECIPES_LOADER_ID, null, this);
+            } else {
+                messageText.setText(noInternet);
+                messageText.setVisibility(View.VISIBLE);
+            }
         }
+
     }
 
     private void setAdapter() {
@@ -118,6 +124,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (recipeList != null)
             recipeList.clear();
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // save instance to not make network calls in future if data already present
+        outState.putParcelableArrayList(JsonKeys.DATA_KEY, recipeList);
+        super.onSaveInstanceState(outState);
     }
 
     @Override

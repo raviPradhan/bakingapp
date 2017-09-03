@@ -19,6 +19,7 @@ import com.ravi.bakingapp.model.Ingredients;
 import com.ravi.bakingapp.model.Recipe;
 import com.ravi.bakingapp.utils.JsonKeys;
 import com.ravi.bakingapp.utils.OnItemClickHandler;
+import com.ravi.bakingapp.utils.PreferencesUtils;
 
 import java.util.ArrayList;
 
@@ -75,6 +76,8 @@ public class RecipeDetailFragment extends Fragment implements OnItemClickHandler
         ingredientsRecycler.setHasFixedSize(true);
 
         Recipe recipeItem = getActivity().getIntent().getParcelableExtra(JsonKeys.DATA_KEY);
+        PreferencesUtils pref = new PreferencesUtils(getContext());
+        pref.setData(JsonKeys.NAME_KEY, recipeItem.getName());
         ingredientsList = recipeItem.getIngredientsList();
         adapter = new IngredientsAdapter(getContext(), ingredientsList);
         ingredientsRecycler.setAdapter(adapter);
