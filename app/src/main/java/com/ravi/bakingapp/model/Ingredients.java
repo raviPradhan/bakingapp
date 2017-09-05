@@ -6,13 +6,39 @@ import android.os.Parcelable;
 public class Ingredients implements Parcelable {
     private String measure, ingredientName, quantity;
 
-    public String getQuantity() {
-        return quantity;
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public void setQuantity(String quantity) {
-        this.quantity = quantity;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.measure);
+        dest.writeString(this.ingredientName);
+        dest.writeString(this.quantity);
     }
+
+    public Ingredients() {
+    }
+
+    protected Ingredients(Parcel in) {
+        this.measure = in.readString();
+        this.ingredientName = in.readString();
+        this.quantity = in.readString();
+    }
+
+    public static final Creator<Ingredients> CREATOR = new Creator<Ingredients>() {
+        @Override
+        public Ingredients createFromParcel(Parcel source) {
+            return new Ingredients(source);
+        }
+
+        @Override
+        public Ingredients[] newArray(int size) {
+            return new Ingredients[size];
+        }
+    };
 
     public String getMeasure() {
         return measure;
@@ -30,36 +56,11 @@ public class Ingredients implements Parcelable {
         this.ingredientName = ingredientName;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getQuantity() {
+        return quantity;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.quantity);
-        dest.writeString(this.measure);
-        dest.writeString(this.ingredientName);
+    public void setQuantity(String quantity) {
+        this.quantity = quantity;
     }
-
-    public Ingredients() {
-    }
-
-    protected Ingredients(Parcel in) {
-        this.quantity = in.readString();
-        this.measure = in.readString();
-        this.ingredientName = in.readString();
-    }
-
-    public static final Parcelable.Creator<Ingredients> CREATOR = new Parcelable.Creator<Ingredients>() {
-        @Override
-        public Ingredients createFromParcel(Parcel source) {
-            return new Ingredients(source);
-        }
-
-        @Override
-        public Ingredients[] newArray(int size) {
-            return new Ingredients[size];
-        }
-    };
 }

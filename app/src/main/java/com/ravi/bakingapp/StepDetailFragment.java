@@ -9,6 +9,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -41,6 +42,10 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
 
     @BindView(R.id.tv_step_detail_description)
     TextView stepDescription;
+    @BindView(R.id.tv_step_detail_noVideo)
+    TextView noVideoText;
+    @BindView(R.id.iv_step_detail_noVideo)
+    ImageView noVideoIcon;
     @BindView(R.id.epv_step_detail_player)
     SimpleExoPlayerView mPlayerView;
     @BindView(R.id.rl_step_detail_noVideo)
@@ -49,6 +54,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     private SimpleExoPlayer mExoPlayer;
     private static MediaSessionCompat mMediaSession;
     private PlaybackStateCompat.Builder mStateBuilder;
+    // An object of @Steps to hold the data passed in through arguments
     Steps stepItem;
 
     private static final String TAG = StepDetailFragment.class.getSimpleName();
@@ -57,7 +63,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if(savedInstanceState == null)
+        if (savedInstanceState == null)
             return inflater.inflate(R.layout.fragment_step_detail, container, false);
         else
             return null;
@@ -81,7 +87,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     }
 
     private String getUrl() {
-        if(getArguments() != null){
+        if (getArguments() != null) {
             stepItem = getArguments().getParcelable(JsonKeys.DATA_KEY);
 
             stepDescription.setText(stepItem.getDescription());
@@ -89,9 +95,14 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
                 return stepItem.getVideoUrl();
             else if (!stepItem.getThumbnailUrl().isEmpty())
                 return stepItem.getThumbnailUrl();
-            else
+            else {
+                noVideoText.setText(getString(R.string.no_video));
                 return null;
-        }else{
+            }
+        } else {
+            noVideoIcon.setVisibility(View.GONE);
+            noVideoText.setText(getString(R.string.select_step));
+            stepDescription.setVisibility(View.GONE);
             return null;
         }
     }

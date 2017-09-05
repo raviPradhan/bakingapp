@@ -121,9 +121,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoaderReset(Loader<ArrayList<Recipe>> loader) {
-        if (recipeList != null)
-            recipeList.clear();
-
     }
 
     @Override
@@ -135,6 +132,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onClick(int position) {
-        startActivity(new Intent(this, MasterActivity.class).putExtra(JsonKeys.DATA_KEY, recipeList.get(position)));
+        startActivity(new Intent(this, MasterActivity.class)
+                .putExtra(JsonKeys.POSITION_KEY, position)
+                .putParcelableArrayListExtra(JsonKeys.DATA_KEY, recipeList));
     }
 }

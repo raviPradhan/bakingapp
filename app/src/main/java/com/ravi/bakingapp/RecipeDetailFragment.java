@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,8 @@ import com.ravi.bakingapp.adapters.StepsAdapter;
 import com.ravi.bakingapp.database.RecipesContract;
 import com.ravi.bakingapp.model.Ingredients;
 import com.ravi.bakingapp.model.Recipe;
+import com.ravi.bakingapp.model.Steps;
+import com.ravi.bakingapp.utils.Constants;
 import com.ravi.bakingapp.utils.JsonKeys;
 import com.ravi.bakingapp.utils.OnItemClickHandler;
 import com.ravi.bakingapp.utils.PreferencesUtils;
@@ -33,27 +36,19 @@ public class RecipeDetailFragment extends Fragment implements OnItemClickHandler
     @BindView(R.id.rv_steps_recycler)
     RecyclerView stepsRecycler;
 
+    ArrayList<Recipe> recipeList;
+    int recipePosition;
+
+    //    Recipe recipeItem;
     ArrayList<Ingredients> ingredientsList;
+    ArrayList<Steps> stepsList;
     IngredientsAdapter adapter;
     StepsAdapter stepsAdapter;
 
-    // Define a new interface OnImageClickListener that triggers a callback in the host activity
-    OnStepSelectedListener mCallback;
-
-    // Override onAttach to make sure that the container activity has implemented the callback
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        // This makes sure that the host activity has implemented the callback interface
-        // If not, it throws an exception
-        try {
-            mCallback = (OnStepSelectedListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement OnImageClickListener");
-        }
-    }
+    // Define a new interface OnStepSelectedListener that triggers a callback in the host activity
+    OnStepSelectedListener mStepCallback;
+    // Define a new interface OnActionClickedListener that triggers a callback in the host activity
+//    OnActionClickedListener mActionCallback;
 
     @Nullable
     @Override
@@ -67,6 +62,16 @@ public class RecipeDetailFragment extends Fragment implements OnItemClickHandler
 
         ButterKnife.bind(this, view);
 
+        recipeList = getActivity().getIntent().getParcelableArrayListExtra(JsonKeys.DATA_KEY);
+        if (savedInstanceState != null) {
+            recipePosition = savedInstanceState.getInt(JsonKeys.POSITION_KEY);
+            Log.v(Constants.TAG, "fragment Saved Position " + recipePosition);
+        }else {
+            recipePosition = getActivity().getIntent().getIntExtra(JsonKeys.POSITION_KEY, -1);
+            Log.v(Constants.TAG, "fragment not saved Position " + recipePosition);
+        }
+
+
         stepsRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         ViewCompat.setNestedScrollingEnabled(stepsRecycler, false);
         stepsRecycler.setHasFixedSize(true);
@@ -75,26 +80,61 @@ public class RecipeDetailFragment extends Fragment implements OnItemClickHandler
         ViewCompat.setNestedScrollingEnabled(ingredientsRecycler, false);
         ingredientsRecycler.setHasFixedSize(true);
 
-        Recipe recipeItem = getActivity().getIntent().getParcelableExtra(JsonKeys.DATA_KEY);
+        setData(recipeList.get(recipePosition), recipePosition);
+//        recipeItem = recipeList.get(recipePosition);
+    }
+
+    public void setData(Recipe recipe, int position) {
+        recipePosition = position;
+        //save name of recipe in shared preference in order for the widget to access it
         PreferencesUtils pref = new PreferencesUtils(getContext());
-        pref.setData(JsonKeys.NAME_KEY, recipeItem.getName());
-        ingredientsList = recipeItem.getIngredientsList();
-        adapter = new IngredientsAdapter(getContext(), ingredientsList);
-        ingredientsRecycler.setAdapter(adapter);
+        pref.setData(JsonKeys.NAME_KEY, recipe.getName());
+        if(ingredientsList != null)
+            ingredientsList.clear();
+        else
+            ingredientsList = new ArrayList<>();
+        if(stepsList != null)
+            stepsList.clear();
+        else
+            stepsList = new ArrayList<>();
 
-        stepsAdapter = new StepsAdapter(getContext(), recipeItem.getStepsList(), this);
-        stepsRecycler.setAdapter(stepsAdapter);
-
+        ingredientsList.addAll(recipe.getIngredientsList());
+        stepsList.addAll(recipe.getStepsList());
+        if (adapter != null && stepsAdapter != null) {
+            adapter.notifyDataSetChanged();
+            stepsAdapter.notifyDataSetChanged();
+        } else {
+            adapter = new IngredientsAdapter(getContext(), ingredientsList);
+            stepsAdapter = new StepsAdapter(getContext(), stepsList, this);
+            ingredientsRecycler.setAdapter(adapter);
+            stepsRecycler.setAdapter(stepsAdapter);
+        }
         createDatabase();
     }
 
-    private void createDatabase(){
+    // Override onAttach to make sure that the container activity has implemented the callback
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // This makes sure that the host activity has implemented the callback interface
+        // If not, it throws an exception
+        try {
+            mStepCallback = (OnStepSelectedListener) context;
+//            mActionCallback = (OnActionClickedListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement Interface");
+        }
+    }
+
+    private void createDatabase() {
         // clear database first
         getActivity().getContentResolver().delete(RecipesContract.RecipeEntry.CONTENT_URI, null, null);
         // create new value set
         ContentValues[] contentValues = new ContentValues[ingredientsList.size()];
         int i = 0;
-        for(Ingredients ingredients : ingredientsList){
+        for (Ingredients ingredients : ingredientsList) {
             ContentValues values = new ContentValues();
             values.put(RecipesContract.RecipeEntry.COLUMN_INGREDIENT, ingredients.getIngredientName());
             values.put(RecipesContract.RecipeEntry.COLUMN_MEASURE, ingredients.getMeasure());
@@ -106,13 +146,34 @@ public class RecipeDetailFragment extends Fragment implements OnItemClickHandler
         WidgetUpdateService.startActionUpdateRecipeWidget(getContext());
     }
 
+    /*
+    * This function is called when a step is selected
+    */
     @Override
     public void onClick(int position) {
-        mCallback.onStepSelected(position);
+        mStepCallback.onStepSelected(position);
+    }
+
+
+    /*@Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt(JsonKeys.POSITION_KEY, recipePosition);
+    }*/
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(JsonKeys.POSITION_KEY, recipePosition);
     }
 
     // OnStepSelectedListener interface, calls a method in the host activity named onStepSelected
     interface OnStepSelectedListener {
         void onStepSelected(int position);
     }
+
+    /*interface OnActionClickedListener {
+        void onActionClicked(int which, int position);
+    }*/
 }

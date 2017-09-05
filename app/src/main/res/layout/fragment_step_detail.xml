@@ -28,11 +28,11 @@
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_centerVertical="true"
-                    android:text="@string/no_video"
                     android:textColor="@color/colorAccent"
                     android:textSize="@dimen/text20" />
 
                 <android.support.v7.widget.AppCompatImageView
+                    android:id="@+id/iv_step_detail_noVideo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_above="@+id/tv_step_detail_noVideo"

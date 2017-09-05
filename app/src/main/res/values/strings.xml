@@ -4,11 +4,16 @@
     <string name="no_recipes" translatable="true">No recipes to show at the moment.</string>
     <string name="no_video" translatable="true">No video to show for this step.</string>
     <string name="no_ingredients" translatable="true">No Ingredients to show.</string>
+    <string name="select_step">Select a step to watch the video here.</string>
+    <string name="first_recipe">This is the first recipe.</string>
+    <string name="last_recipe">This is the last recipe.</string>
 
     <string name="ingredients" translatable="true">Ingredients</string>
     <string name="steps" translatable="true">Steps</string>
     <string name="bullet">\u25CF</string>
     <string name="dynamic_quantity">%1$s %2$s</string>
     <string name="appwidget_text">BAKING</string>
-    <string name="add_widget">Add widget</string>
+
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
 </resources>
