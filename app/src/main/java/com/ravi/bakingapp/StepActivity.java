@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.ravi.bakingapp.model.Steps;
 import com.ravi.bakingapp.utils.JsonKeys;
@@ -26,6 +27,10 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.bt_step_next)
     Button next;
 
+    ArrayList<Steps> stepsList;
+    Steps stepItem;
+    int position;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,9 +38,9 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_step);
 
         ButterKnife.bind(this);
-        ArrayList<Steps> stepsList = getIntent().getParcelableExtra(JsonKeys.DATA_KEY);
-        int position = getIntent().getIntExtra(JsonKeys.POSITION_KEY, -1);
-        Steps stepItem = stepsList.get(position);
+        stepsList = getIntent().getParcelableArrayListExtra(JsonKeys.DATA_KEY);
+        position = getIntent().getIntExtra(JsonKeys.POSITION_KEY, -1);
+        stepItem = stepsList.get(position);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(stepItem.getShortDescription());
@@ -46,10 +51,37 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
         next.setOnClickListener(this);
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.bt_step_previous:
+                if(position == 0){
+                    Toast.makeText(this, getString(R.string.first_step), Toast.LENGTH_SHORT).show();
+                }else{
+                    position --;
+                    stepItem = stepsList.get(position);
+                    replaceFragment();
+                    getSupportActionBar().setTitle(stepItem.getShortDescription());
+                }
+                break;
+
+            case R.id.bt_step_next:
+                if(position < stepsList.size() - 1){
+                    position ++;
+                    stepItem = stepsList.get(position);
+                    replaceFragment();
+                    getSupportActionBar().setTitle(stepItem.getShortDescription());
+                }else{
+                    Toast.makeText(this, getString(R.string.last_step), Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
+
     private void replaceFragment(){
         Fragment fragment = new StepDetailFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(JsonKeys.DATA_KEY, getIntent().getParcelableExtra(JsonKeys.DATA_KEY));
+        bundle.putParcelable(JsonKeys.DATA_KEY, stepItem);
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.fl_step_container, fragment).commit();
     }

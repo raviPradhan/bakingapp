@@ -3,6 +3,9 @@ package com.ravi.bakingapp;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +18,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.ravi.bakingapp.IdlingResource.SimpleIdlingResource;
 import com.ravi.bakingapp.adapters.RecipeListAdapter;
 import com.ravi.bakingapp.model.Recipe;
 import com.ravi.bakingapp.tasks.GetRecipesLoader;
@@ -51,6 +55,27 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     RecipeListAdapter adapter;
 
     private static final int RECIPES_LOADER_ID = 100;
+
+//    Add a SimpleIdlingResource variable that will be null in production
+    @Nullable
+    private SimpleIdlingResource simpleIdlingResource;
+
+    /*
+     * DONE Create a method that returns the IdlingResource variable. It will
+     * instantiate a new instance of SimpleIdlingResource if the IdlingResource is null.
+     * This method will only be called from test.
+     */
+    /*
+     * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
+     */
+    @VisibleForTesting
+    @NonNull
+    public SimpleIdlingResource getIdlingResource() {
+        if (simpleIdlingResource == null) {
+            simpleIdlingResource = new SimpleIdlingResource();
+        }
+        return simpleIdlingResource;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +118,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             recipeRecycler.setAdapter(adapter);
         } else {
             adapter.notifyDataSetChanged();
+            if (simpleIdlingResource != null) {
+                simpleIdlingResource.setIdleState(true);
+            }
         }
     }
 
@@ -100,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public Loader<ArrayList<Recipe>> onCreateLoader(int id, Bundle args) {
         progress.setVisibility(View.VISIBLE);
         if (NetworkUtils.isInternetConnected(this)) {
-            return new GetRecipesLoader(this, Constants.GET_RECIPES_URL);
+            return new GetRecipesLoader(this, Constants.GET_RECIPES_URL, getIdlingResource());
         } else {
             return null;
         }

@@ -1,8 +1,10 @@
 package com.ravi.bakingapp.tasks;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v4.content.AsyncTaskLoader;
 
+import com.ravi.bakingapp.IdlingResource.SimpleIdlingResource;
 import com.ravi.bakingapp.model.Ingredients;
 import com.ravi.bakingapp.model.Recipe;
 import com.ravi.bakingapp.model.Steps;
@@ -20,14 +22,24 @@ public class GetRecipesLoader extends AsyncTaskLoader<ArrayList<Recipe>> {
 
     private ArrayList<Recipe> recipeList;
     private String url;
+    SimpleIdlingResource idlingResource;
 
-    public GetRecipesLoader(Context context, String url) {
+    public GetRecipesLoader(Context context, String url, @Nullable SimpleIdlingResource idlingResource) {
         super(context);
         this.url = url;
+        this.idlingResource = idlingResource;
     }
 
     @Override
     protected void onStartLoading() {
+        /*
+        *If the idle state is true, Espresso can perform the next action.
+         * If the idle state is false, Espresso will wait until it is true before
+         * performing the next action.
+        * */
+        if (idlingResource != null)
+            idlingResource.setIdleState(false);
+
         if (recipeList != null) {
             // Delivers any previously loaded data immediately
             deliverResult(recipeList);
@@ -88,7 +100,7 @@ public class GetRecipesLoader extends AsyncTaskLoader<ArrayList<Recipe>> {
         return recipeData;
     }
 
-    // deliverResult sends the result of the load, a Cursor, to the registered listener
+    // deliverResult sends the result of the load, a ArrayList, to the registered listener
     public void deliverResult(ArrayList<Recipe> data) {
         recipeList = data;
         super.deliverResult(data);

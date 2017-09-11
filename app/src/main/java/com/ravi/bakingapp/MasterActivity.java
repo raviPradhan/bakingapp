@@ -8,14 +8,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.ravi.bakingapp.model.Recipe;
-import com.ravi.bakingapp.utils.Constants;
 import com.ravi.bakingapp.utils.JsonKeys;
 
 import java.util.ArrayList;
@@ -24,7 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MasterActivity extends AppCompatActivity implements RecipeDetailFragment.OnStepSelectedListener,
-        /*RecipeDetailFragment.OnActionClickedListener,*/ View.OnClickListener {
+        View.OnClickListener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -51,10 +49,10 @@ public class MasterActivity extends AppCompatActivity implements RecipeDetailFra
         recipeList = getIntent().getParcelableArrayListExtra(JsonKeys.DATA_KEY);
         if (savedInstanceState != null) {
             recipePosition = savedInstanceState.getInt(JsonKeys.POSITION_KEY);
-            Log.v(Constants.TAG, "Saved Position " + recipePosition);
-        }else {
+//            Log.v(Constants.TAG, "Saved Position " + recipePosition);
+        } else {
             recipePosition = getIntent().getIntExtra(JsonKeys.POSITION_KEY, -1);
-            Log.v(Constants.TAG, "not saved Position " + recipePosition);
+//            Log.v(Constants.TAG, "not saved Position " + recipePosition);
         }
         recipeItem = recipeList.get(recipePosition);
 
@@ -87,7 +85,9 @@ public class MasterActivity extends AppCompatActivity implements RecipeDetailFra
             fragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.fl_master_container, fragment).commit();
         } else {
-            startActivity(new Intent(this, StepActivity.class).putExtra(JsonKeys.DATA_KEY, recipeItem.getStepsList().get(position)));
+            startActivity(new Intent(this, StepActivity.class)
+                    .putExtra(JsonKeys.DATA_KEY, recipeItem.getStepsList())
+                    .putExtra(JsonKeys.POSITION_KEY, position));
         }
     }
 
@@ -102,24 +102,14 @@ public class MasterActivity extends AppCompatActivity implements RecipeDetailFra
                 if (recipePosition > 0) {
                     --recipePosition;
                     recipeItem = recipeList.get(recipePosition);
-                    Log.v(Constants.TAG, "POSITION: " + recipePosition + " recipe name: "
+                    /*Log.v(Constants.TAG, "POSITION: " + recipePosition + " recipe name: "
                             + recipeList.get(recipePosition).getName() + " ingredient size: "
                             + recipeList.get(recipePosition).getIngredientsList().size() + " NAME: "
                             + recipeList.get(recipePosition).getIngredientsList().get(0).getIngredientName());
 
                     Log.v(Constants.TAG, "SIZE: " + recipeList.get(0).getIngredientsList().size()
-                            + "name: " + recipeList.get(0).getIngredientsList().get(0).getIngredientName());
+                            + "name: " + recipeList.get(0).getIngredientsList().get(0).getIngredientName());*/
                     fragment.setData(recipeItem, recipePosition);
-                    /*ingredientsList.clear();
-                    stepsList.clear();
-                    ingredientsList.addAll(recipeItem.getIngredientsList());
-                    stepsList.addAll(recipeItem.getStepsList());*/
-                    /*Log.v(Constants.TAG, "" + recipePosition +
-                            " Ingredient size: " + ingredientsList.size() +
-                            " NAME: " + ingredientsList.get(0).getIngredientName());
-                    adapter.notifyDataSetChanged();
-                    stepsAdapter.notifyDataSetChanged();
-                    mActionCallback.onActionClicked(0, recipePosition);*/
                 } else {
                     Toast.makeText(this, getString(R.string.first_recipe), Toast.LENGTH_SHORT).show();
                 }
@@ -129,20 +119,13 @@ public class MasterActivity extends AppCompatActivity implements RecipeDetailFra
                 if (recipePosition != recipeList.size() - 1) {
                     ++recipePosition;
                     recipeItem = recipeList.get(recipePosition);
-                    Log.v(Constants.TAG, "POSITION: " + recipePosition + " recipe name: "
+                    /*Log.v(Constants.TAG, "POSITION: " + recipePosition + " recipe name: "
                             + recipeList.get(recipePosition).getName() + " ingredient size: "
                             + recipeList.get(recipePosition).getIngredientsList().size() + " NAME: "
-                            + recipeList.get(recipePosition).getIngredientsList().get(0).getIngredientName());
-                    Log.v(Constants.TAG, "SIZE: " + recipeList.get(0).getIngredientsList().size()
-                            + "name: " + recipeList.get(0).getIngredientsList().get(0).getIngredientName());
+                            + recipeList.get(recipePosition).getIngredientsList().get(0).getIngredientName());*/
+                    /*Log.v(Constants.TAG, "SIZE: " + recipeList.get(0).getIngredientsList().size()
+                            + "name: " + recipeList.get(0).getIngredientsList().get(0).getIngredientName());*/
                     fragment.setData(recipeItem, recipePosition);
-                    /*ingredientsList.clear();
-                    ingredientsList.addAll(recipeItem.getIngredientsList());
-                    stepsList.clear();
-                    stepsList.addAll(recipeItem.getStepsList());
-                    adapter.notifyDataSetChanged();
-                    stepsAdapter.notifyDataSetChanged();
-                    mActionCallback.onActionClicked(1, recipePosition);*/
                 } else {
                     Toast.makeText(this, getString(R.string.last_recipe), Toast.LENGTH_SHORT).show();
                 }
@@ -154,7 +137,7 @@ public class MasterActivity extends AppCompatActivity implements RecipeDetailFra
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.v(Constants.TAG, "SAVE POSITION " + recipePosition);
+//        Log.v(Constants.TAG, "SAVE POSITION " + recipePosition);
         outState.putInt(JsonKeys.POSITION_KEY, recipePosition);
     }
 

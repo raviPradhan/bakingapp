@@ -7,6 +7,8 @@
     <string name="select_step">Select a step to watch the video here.</string>
     <string name="first_recipe">This is the first recipe.</string>
     <string name="last_recipe">This is the last recipe.</string>
+    <string name="first_step">This is the first step.</string>
+    <string name="last_step">This is the last step.</string>
 
     <string name="ingredients" translatable="true">Ingredients</string>
     <string name="steps" translatable="true">Steps</string>
