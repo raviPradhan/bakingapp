@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.ravi.bakingapp.model.Steps;
+import com.ravi.bakingapp.utils.Constants;
 import com.ravi.bakingapp.utils.JsonKeys;
 
 import butterknife.BindView;
@@ -56,17 +58,32 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     private PlaybackStateCompat.Builder mStateBuilder;
     // An object of @Steps to hold the data passed in through arguments
     Steps stepItem;
+    Uri videoUri;
 
-    private static final String TAG = StepDetailFragment.class.getSimpleName();
-
+    static long videoPosition;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
+            stepItem = getArguments().getParcelable(JsonKeys.DATA_KEY);
             return inflater.inflate(R.layout.fragment_step_detail, container, false);
-        else
+        }else {
+            if(savedInstanceState.containsKey(JsonKeys.DATA_KEY)) {
+                stepItem = savedInstanceState.getParcelable(JsonKeys.DATA_KEY);
+                Log.v(Constants.TAG, "DATA SAVED " + stepItem.getId());
+            }else {
+                stepItem = getArguments().getParcelable(JsonKeys.DATA_KEY);
+                Log.v(Constants.TAG, "DATA FROM ARGS " + stepItem.getId());
+            }
+
+            if (savedInstanceState.containsKey(String.valueOf(stepItem.getId()))) {
+                videoPosition = savedInstanceState.getLong(String.valueOf(stepItem.getId()));
+                Log.v(Constants.TAG, "RETURN AT POSITION " + videoPosition);
+            }else
+                videoPosition = 0;
             return null;
+        }
     }
 
     @Override
@@ -74,22 +91,25 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         super.onViewCreated(view, savedInstanceState);
 
         ButterKnife.bind(this, view);
-        String urlToPlay = getUrl();
-        if (urlToPlay == null) {
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        if (getUrl() == null) {
             noVideoLayout.setVisibility(View.VISIBLE);
             mPlayerView.setVisibility(GONE);
         } else {
             // Initialize the Media Session.
+            videoUri = Uri.parse(getUrl());
+            Log.v(Constants.TAG, "VIDEO CHANGED");
             initializeMediaSession();
-            // Initialize the player.
-            initializePlayer(Uri.parse(urlToPlay));
         }
     }
 
     private String getUrl() {
         if (getArguments() != null) {
-            stepItem = getArguments().getParcelable(JsonKeys.DATA_KEY);
-
             stepDescription.setText(stepItem.getDescription());
             if (!stepItem.getVideoUrl().isEmpty())
                 return stepItem.getVideoUrl();
@@ -114,7 +134,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     private void initializeMediaSession() {
 
         // Create a MediaSessionCompat.
-        mMediaSession = new MediaSessionCompat(getContext(), TAG);
+        mMediaSession = new MediaSessionCompat(getContext(), Constants.TAG);
 
         // Enable callbacks from MediaButtons and TransportControls.
         mMediaSession.setFlags(
@@ -163,6 +183,10 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             String userAgent = Util.getUserAgent(getContext(), getString(R.string.app_name));
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
+            if (videoPosition > 0) {
+                Log.v(Constants.TAG, "INIT NULL PLAYER " + videoPosition);
+                mExoPlayer.seekTo(videoPosition);
+            }
             mExoPlayer.prepare(mediaSource);
             mExoPlayer.setPlayWhenReady(true);
         }
@@ -173,31 +197,34 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
      */
     private void releasePlayer() {
         if (mExoPlayer != null) {
+            videoPosition = mExoPlayer.getCurrentPosition();
             mExoPlayer.stop();
             mExoPlayer.release();
             mExoPlayer = null;
         }
+
+        if (mMediaSession != null)
+            mMediaSession.setActive(false);
     }
 
     /**
-     * Release the player when the activity is destroyed.
+     * Release the player when the activity is paused.
      */
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
+    public void onPause() {
+        super.onPause();
         releasePlayer();
-        if (mMediaSession != null)
-            mMediaSession.setActive(false);
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onResume() {
+        super.onResume();
 
-        releasePlayer();
-        if (mMediaSession != null)
-            mMediaSession.setActive(false);
+        // Initialize the player.
+        if (videoUri != null) {
+            Log.v(Constants.TAG, "resume called " + videoPosition);
+            initializePlayer(videoUri);
+        }
     }
 
     @Override
@@ -250,5 +277,13 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         public void onPause() {
             mExoPlayer.setPlayWhenReady(false);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.v(Constants.TAG, "SAVE POSITION AT " + videoPosition + "id: " + stepItem.getId());
+        outState.putLong(String.valueOf(stepItem.getId()), videoPosition);
+        outState.putParcelable(JsonKeys.DATA_KEY, stepItem);
     }
 }

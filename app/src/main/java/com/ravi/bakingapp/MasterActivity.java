@@ -85,9 +85,10 @@ public class MasterActivity extends AppCompatActivity implements RecipeDetailFra
             fragment.setArguments(bundle);
             getSupportFragmentManager().beginTransaction().replace(R.id.fl_master_container, fragment).commit();
         } else {
-            startActivity(new Intent(this, StepActivity.class)
-                    .putExtra(JsonKeys.DATA_KEY, recipeItem.getStepsList())
-                    .putExtra(JsonKeys.POSITION_KEY, position));
+            Intent intent = new Intent(this, StepActivity.class);
+            intent.putExtra(JsonKeys.DATA_KEY, recipeItem.getStepsList())
+                    .putExtra(JsonKeys.POSITION_KEY, position);
+            startActivity(intent);
         }
     }
 
