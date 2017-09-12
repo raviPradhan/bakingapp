@@ -39,13 +39,19 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
 
         ButterKnife.bind(this);
         stepsList = getIntent().getParcelableArrayListExtra(JsonKeys.DATA_KEY);
-        position = getIntent().getIntExtra(JsonKeys.POSITION_KEY, -1);
-        stepItem = stepsList.get(position);
+        if(savedInstanceState != null){
+            position = savedInstanceState.getInt(JsonKeys.POSITION_KEY);
+            stepItem = savedInstanceState.getParcelable(JsonKeys.DATA_KEY);
+        }else {
+            position = getIntent().getIntExtra(JsonKeys.POSITION_KEY, -1);
+            stepItem = stepsList.get(position);
+        }
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(stepItem.getShortDescription());
 
-        replaceFragment();
+        if (savedInstanceState == null)
+            replaceFragment();
 
         previous.setOnClickListener(this);
         next.setOnClickListener(this);
@@ -53,12 +59,12 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.bt_step_previous:
-                if(position == 0){
+                if (position == 0) {
                     Toast.makeText(this, getString(R.string.first_step), Toast.LENGTH_SHORT).show();
-                }else{
-                    position --;
+                } else {
+                    position--;
                     stepItem = stepsList.get(position);
                     replaceFragment();
                     getSupportActionBar().setTitle(stepItem.getShortDescription());
@@ -66,19 +72,19 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.bt_step_next:
-                if(position < stepsList.size() - 1){
-                    position ++;
+                if (position < stepsList.size() - 1) {
+                    position++;
                     stepItem = stepsList.get(position);
                     replaceFragment();
                     getSupportActionBar().setTitle(stepItem.getShortDescription());
-                }else{
+                } else {
                     Toast.makeText(this, getString(R.string.last_step), Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
     }
 
-    private void replaceFragment(){
+    private void replaceFragment() {
         Fragment fragment = new StepDetailFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(JsonKeys.DATA_KEY, stepItem);
@@ -87,9 +93,17 @@ public class StepActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt(JsonKeys.POSITION_KEY, position);
+        outState.putParcelable(JsonKeys.DATA_KEY, stepItem);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if(android.R.id.home == item.getItemId())
+        if (android.R.id.home == item.getItemId())
             finish();
 
         return super.onOptionsItemSelected(item);

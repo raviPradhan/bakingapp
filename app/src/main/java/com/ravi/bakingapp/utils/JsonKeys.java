@@ -21,6 +21,8 @@ public class JsonKeys {
 
     public static final String DATA_KEY = "data";
     public static final String POSITION_KEY = "position";
+    public static final String VIDEO_POSITION_KEY = "videoPosition";
+    public static final String VIDEO_DATA_KEY = "videoData";
 
 
 }

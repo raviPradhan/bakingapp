@@ -60,32 +60,43 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     Steps stepItem;
     Uri videoUri;
 
-    static long videoPosition;
+    long videoPosition;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setRetainInstance(false);
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.v(Constants.TAG, "CALLED CREATE ");
         View view = inflater.inflate(R.layout.fragment_step_detail, container, false);
 
         ButterKnife.bind(this, view);
         if (getArguments() != null) {
-            stepItem = getArguments().getParcelable(JsonKeys.DATA_KEY);
+            if (savedInstanceState != null && savedInstanceState.containsKey(JsonKeys.VIDEO_DATA_KEY))
+                stepItem = savedInstanceState.getParcelable(JsonKeys.VIDEO_DATA_KEY);
+            else
+                stepItem = getArguments().getParcelable(JsonKeys.DATA_KEY);
             if (getUrl() == null) {
                 noVideoLayout.setVisibility(View.VISIBLE);
                 mPlayerView.setVisibility(GONE);
             } else {
-                // Initialize the Media Session.
+                if (savedInstanceState != null && savedInstanceState.containsKey(JsonKeys.VIDEO_POSITION_KEY)) {
+                    videoPosition = savedInstanceState.getLong(JsonKeys.VIDEO_POSITION_KEY);
+                    Log.v(Constants.TAG, "RETURN AT POSITION " + videoPosition);
+                } else
+                    videoPosition = 0;
+
                 videoUri = Uri.parse(getUrl());
-                Log.v(Constants.TAG, "VIDEO CHANGED");
+                Log.v(Constants.TAG, "VIDEO CHANGED " + videoPosition);
+                // Initialize the Media Session.
                 initializeMediaSession();
             }
         }
-
-        /*if (savedInstanceState.containsKey(String.valueOf(stepItem.getId()))) {
-            videoPosition = savedInstanceState.getLong(String.valueOf(stepItem.getId()));
-            Log.v(Constants.TAG, "RETURN AT POSITION " + videoPosition);
-        } else
-            videoPosition = 0;*/
         return view;
     }
 
@@ -262,9 +273,10 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+
         Log.v(Constants.TAG, "SAVED POSITION AT " + videoPosition);
-        outState.putLong(JsonKeys.POSITION_KEY, videoPosition);
-        outState.putParcelable(JsonKeys.DATA_KEY, stepItem);
+        outState.putLong(JsonKeys.VIDEO_POSITION_KEY, videoPosition);
+        outState.putParcelable(JsonKeys.VIDEO_DATA_KEY, stepItem);
+        super.onSaveInstanceState(outState);
     }
 }

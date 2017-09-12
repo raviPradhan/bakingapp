@@ -8,12 +8,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.ravi.bakingapp.model.Recipe;
+import com.ravi.bakingapp.utils.Constants;
 import com.ravi.bakingapp.utils.JsonKeys;
 
 import java.util.ArrayList;
@@ -60,16 +62,19 @@ public class MasterActivity extends AppCompatActivity implements RecipeDetailFra
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(recipeItem.getName());
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (findViewById(R.id.fl_master_container) == null) {
             twoPane = false;
+            Log.v(Constants.TAG, "DID NOT FIND VIEW");
         } else {
-            if (findViewById(R.id.fl_master_container) != null) {
-                twoPane = true;
-                if (savedInstanceState == null) {
-                    Fragment fragment = new StepDetailFragment();
-                    getSupportFragmentManager().beginTransaction().add(R.id.fl_master_container, fragment).commit();
-                }
+            Log.v(Constants.TAG, "FOUND VIEW");
+            twoPane = true;
+            if (savedInstanceState == null) {
+                Fragment fragment = new StepDetailFragment();
+                getSupportFragmentManager().beginTransaction().add(R.id.fl_master_container, fragment).commit();
             }
+            /*}else{
+
+            }*/
         }
         fragment = (RecipeDetailFragment) getSupportFragmentManager().findFragmentById(R.id.master_detail_fragment);
         previousButton.setOnClickListener(this);
@@ -138,14 +143,8 @@ public class MasterActivity extends AppCompatActivity implements RecipeDetailFra
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-//        Log.v(Constants.TAG, "SAVE POSITION " + recipePosition);
+        // Save the position of the recipe for orientation change
         outState.putInt(JsonKeys.POSITION_KEY, recipePosition);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-
-        super.onSaveInstanceState(outState, outPersistentState);
     }
 
     @Override
