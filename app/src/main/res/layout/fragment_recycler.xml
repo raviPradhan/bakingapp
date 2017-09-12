@@ -5,6 +5,7 @@
     android:orientation="vertical">
 
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nsv_recycler_wrapper"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 

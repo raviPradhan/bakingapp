@@ -65,46 +65,38 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            stepItem = getArguments().getParcelable(JsonKeys.DATA_KEY);
-            return inflater.inflate(R.layout.fragment_step_detail, container, false);
-        }else {
-            if(savedInstanceState.containsKey(JsonKeys.DATA_KEY)) {
-                stepItem = savedInstanceState.getParcelable(JsonKeys.DATA_KEY);
-                Log.v(Constants.TAG, "DATA SAVED " + stepItem.getId());
-            }else {
-                stepItem = getArguments().getParcelable(JsonKeys.DATA_KEY);
-                Log.v(Constants.TAG, "DATA FROM ARGS " + stepItem.getId());
-            }
-
-            if (savedInstanceState.containsKey(String.valueOf(stepItem.getId()))) {
-                videoPosition = savedInstanceState.getLong(String.valueOf(stepItem.getId()));
-                Log.v(Constants.TAG, "RETURN AT POSITION " + videoPosition);
-            }else
-                videoPosition = 0;
-            return null;
-        }
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        View view = inflater.inflate(R.layout.fragment_step_detail, container, false);
 
         ButterKnife.bind(this, view);
+        if (getArguments() != null) {
+            stepItem = getArguments().getParcelable(JsonKeys.DATA_KEY);
+            if (getUrl() == null) {
+                noVideoLayout.setVisibility(View.VISIBLE);
+                mPlayerView.setVisibility(GONE);
+            } else {
+                // Initialize the Media Session.
+                videoUri = Uri.parse(getUrl());
+                Log.v(Constants.TAG, "VIDEO CHANGED");
+                initializeMediaSession();
+            }
+        }
+
+        /*if (savedInstanceState.containsKey(String.valueOf(stepItem.getId()))) {
+            videoPosition = savedInstanceState.getLong(String.valueOf(stepItem.getId()));
+            Log.v(Constants.TAG, "RETURN AT POSITION " + videoPosition);
+        } else
+            videoPosition = 0;*/
+        return view;
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
 
-        if (getUrl() == null) {
-            noVideoLayout.setVisibility(View.VISIBLE);
-            mPlayerView.setVisibility(GONE);
-        } else {
-            // Initialize the Media Session.
-            videoUri = Uri.parse(getUrl());
-            Log.v(Constants.TAG, "VIDEO CHANGED");
-            initializeMediaSession();
+        // Initialize the player.
+        if (videoUri != null) {
+            Log.v(Constants.TAG, "resume called " + videoPosition);
+            initializePlayer(videoUri);
         }
     }
 
@@ -184,12 +176,21 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
             if (videoPosition > 0) {
-                Log.v(Constants.TAG, "INIT NULL PLAYER " + videoPosition);
+                Log.v(Constants.TAG, "SEEKING PLAYER " + videoPosition);
                 mExoPlayer.seekTo(videoPosition);
             }
             mExoPlayer.prepare(mediaSource);
             mExoPlayer.setPlayWhenReady(true);
         }
+    }
+
+    /**
+     * Release the player when the activity is paused.
+     */
+    @Override
+    public void onPause() {
+        super.onPause();
+        releasePlayer();
     }
 
     /**
@@ -205,26 +206,6 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
 
         if (mMediaSession != null)
             mMediaSession.setActive(false);
-    }
-
-    /**
-     * Release the player when the activity is paused.
-     */
-    @Override
-    public void onPause() {
-        super.onPause();
-        releasePlayer();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // Initialize the player.
-        if (videoUri != null) {
-            Log.v(Constants.TAG, "resume called " + videoPosition);
-            initializePlayer(videoUri);
-        }
     }
 
     @Override
@@ -282,8 +263,8 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.v(Constants.TAG, "SAVE POSITION AT " + videoPosition + "id: " + stepItem.getId());
-        outState.putLong(String.valueOf(stepItem.getId()), videoPosition);
+        Log.v(Constants.TAG, "SAVED POSITION AT " + videoPosition);
+        outState.putLong(JsonKeys.POSITION_KEY, videoPosition);
         outState.putParcelable(JsonKeys.DATA_KEY, stepItem);
     }
 }
