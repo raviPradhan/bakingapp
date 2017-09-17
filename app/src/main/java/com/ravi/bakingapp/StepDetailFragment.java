@@ -72,10 +72,19 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.v(Constants.TAG, "CALLED CREATE ");
-        View view = inflater.inflate(R.layout.fragment_step_detail, container, false);
+//        Log.v(Constants.TAG, "CALLED CREATE ");
 
+        View view = inflater.inflate(R.layout.fragment_step_detail, container, false);
         ButterKnife.bind(this, view);
+
+        if(savedInstanceState == null){
+            noVideoLayout.setVisibility(View.VISIBLE);
+            mPlayerView.setVisibility(GONE);
+            noVideoIcon.setVisibility(View.GONE);
+            noVideoText.setText(getString(R.string.select_step));
+            stepDescription.setVisibility(View.GONE);
+        }
+
         if (getArguments() != null) {
             if (savedInstanceState != null && savedInstanceState.containsKey(JsonKeys.VIDEO_DATA_KEY))
                 stepItem = savedInstanceState.getParcelable(JsonKeys.VIDEO_DATA_KEY);
@@ -87,12 +96,12 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             } else {
                 if (savedInstanceState != null && savedInstanceState.containsKey(JsonKeys.VIDEO_POSITION_KEY)) {
                     videoPosition = savedInstanceState.getLong(JsonKeys.VIDEO_POSITION_KEY);
-                    Log.v(Constants.TAG, "RETURN AT POSITION " + videoPosition);
+//                    Log.v(Constants.TAG, "RETURN AT POSITION " + videoPosition);
                 } else
                     videoPosition = 0;
 
                 videoUri = Uri.parse(getUrl());
-                Log.v(Constants.TAG, "VIDEO CHANGED " + videoPosition);
+//                Log.v(Constants.TAG, "VIDEO CHANGED " + videoPosition);
                 // Initialize the Media Session.
                 initializeMediaSession();
             }
@@ -105,14 +114,26 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
         super.onResume();
 
         // Initialize the player.
-        if (videoUri != null) {
-            Log.v(Constants.TAG, "resume called " + videoPosition);
-            initializePlayer(videoUri);
+        if(getActivity() instanceof MasterActivity){ // if its a master-child view then only take steps to initialize vidoe player
+            if(((MasterActivity)getActivity()).twoPane){ // if the view is twoPane then only initialize the video player
+                if (videoUri != null) {
+//                    Log.v(Constants.TAG, "resume called from masteractivity " + videoPosition);
+                    initializePlayer(videoUri);
+                }
+            }
+        }else{
+            if (videoUri != null) {
+//                Log.v(Constants.TAG, "resume called from stepactivity " + videoPosition);
+                initializePlayer(videoUri);
+            }
         }
     }
 
     private String getUrl() {
         if (getArguments() != null) {
+            noVideoLayout.setVisibility(View.GONE);
+            mPlayerView.setVisibility(View.VISIBLE);
+            stepDescription.setVisibility(View.VISIBLE);
             stepDescription.setText(stepItem.getDescription());
             if (!stepItem.getVideoUrl().isEmpty())
                 return stepItem.getVideoUrl();
@@ -123,9 +144,6 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
                 return null;
             }
         } else {
-            noVideoIcon.setVisibility(View.GONE);
-            noVideoText.setText(getString(R.string.select_step));
-            stepDescription.setVisibility(View.GONE);
             return null;
         }
     }
@@ -187,7 +205,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
             if (videoPosition > 0) {
-                Log.v(Constants.TAG, "SEEKING PLAYER " + videoPosition);
+//                Log.v(Constants.TAG, "SEEKING PLAYER " + videoPosition);
                 mExoPlayer.seekTo(videoPosition);
             }
             mExoPlayer.prepare(mediaSource);
@@ -274,7 +292,7 @@ public class StepDetailFragment extends Fragment implements ExoPlayer.EventListe
     @Override
     public void onSaveInstanceState(Bundle outState) {
 
-        Log.v(Constants.TAG, "SAVED POSITION AT " + videoPosition);
+//        Log.v(Constants.TAG, "SAVED POSITION AT " + videoPosition);
         outState.putLong(JsonKeys.VIDEO_POSITION_KEY, videoPosition);
         outState.putParcelable(JsonKeys.VIDEO_DATA_KEY, stepItem);
         super.onSaveInstanceState(outState);

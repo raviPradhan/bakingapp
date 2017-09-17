@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +18,6 @@ import com.ravi.bakingapp.database.RecipesContract;
 import com.ravi.bakingapp.model.Ingredients;
 import com.ravi.bakingapp.model.Recipe;
 import com.ravi.bakingapp.model.Steps;
-import com.ravi.bakingapp.utils.Constants;
 import com.ravi.bakingapp.utils.JsonKeys;
 import com.ravi.bakingapp.utils.OnItemClickHandler;
 import com.ravi.bakingapp.utils.PreferencesUtils;
@@ -65,10 +63,10 @@ public class RecipeDetailFragment extends Fragment implements OnItemClickHandler
         recipeList = getActivity().getIntent().getParcelableArrayListExtra(JsonKeys.DATA_KEY);
         if (savedInstanceState != null) {
             recipePosition = savedInstanceState.getInt(JsonKeys.POSITION_KEY);
-            Log.v(Constants.TAG, "fragment Saved Position " + recipePosition);
+//            Log.v(Constants.TAG, "fragment Saved Position " + recipePosition);
         }else {
             recipePosition = getActivity().getIntent().getIntExtra(JsonKeys.POSITION_KEY, -1);
-            Log.v(Constants.TAG, "fragment not saved Position " + recipePosition);
+//            Log.v(Constants.TAG, "fragment not saved Position " + recipePosition);
         }
 
 

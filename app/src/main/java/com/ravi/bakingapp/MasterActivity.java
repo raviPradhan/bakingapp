@@ -1,9 +1,7 @@
 package com.ravi.bakingapp;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -35,7 +33,7 @@ public class MasterActivity extends AppCompatActivity implements RecipeDetailFra
 
     RecipeDetailFragment fragment;
 
-    boolean twoPane;
+    public boolean twoPane;
     ArrayList<Recipe> recipeList = new ArrayList<>();
     Recipe recipeItem;
     int recipePosition;
@@ -64,9 +62,9 @@ public class MasterActivity extends AppCompatActivity implements RecipeDetailFra
 
         if (findViewById(R.id.fl_master_container) == null) {
             twoPane = false;
-            Log.v(Constants.TAG, "DID NOT FIND VIEW");
+//            Log.v(Constants.TAG, "DID NOT FIND VIEW");
         } else {
-            Log.v(Constants.TAG, "FOUND VIEW");
+//            Log.v(Constants.TAG, "FOUND VIEW");
             twoPane = true;
             if (savedInstanceState == null) {
                 Fragment fragment = new StepDetailFragment();
